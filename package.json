@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.10",
+    "@types/graphql": "^14.5.0",
     "graphql": "^16.8.1",
     "ra-data-graphql": "^4.16.7",
     "react": "^18.2.0",

@@ -1,43 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import buildGraphQLProvider, { IntrospectionResult } from 'ra-data-graphql';
-import { Admin, ListGuesser, Resource } from 'react-admin';
-import buildQuery from './buildQuery';
-import { BuildQueryFunction } from './types';
+import React, { useState, useEffect } from "react";
+import buildGraphQLProvider, { BuildQueryFactory } from "ra-data-graphql";
+import { Admin, DataProvider, ListGuesser, Resource } from "react-admin";
+import buildQuery from "./source/graphql/buildQuery";
+import { __schema as schema } from "./source/graphql/schema.json";
 
 const App: React.FC = () => {
-  const [dataProvider, setDataProvider] = useState<any>(null);
-
+  const [dataProvider, setDataProvider] = useState<DataProvider>();
   useEffect(() => {
-    const fetchDataProvider = async () => {
-      try {
-        const introspection: IntrospectionResult = await fetch('https://swapi-graphql.netlify.app/.netlify/functions/index', { method: 'POST' }).then((response) => response.json());
-
-        const buildQueryFn: BuildQueryFunction = buildQuery(introspection);
-
-        const dataProvider = await buildGraphQLProvider({
-          buildQuery: buildQueryFn,
-          introspection: introspection,
-        });
-
-        setDataProvider(dataProvider);
-      } catch (error) {
-        console.error('Error setting up data provider:', error);
-      }
-    };
-
-    fetchDataProvider();
+    buildGraphQLProvider({
+      clientOptions: {
+        uri: "https://swapi-graphql.netlify.app/.netlify/functions/index",
+      },
+      // @ts-expect-error schema
+      introspection: { schema },
+      buildQuery: buildQuery as BuildQueryFactory,
+    })
+      .then((dataProvider) => setDataProvider(dataProvider))
+      .catch((err) => console.log(err));
   }, []);
 
   if (!dataProvider) {
     return <div>Loading</div>;
   }
 
-  console.log(dataProvider);
-
   return (
     <Admin title="Star Wars API" dataProvider={dataProvider}>
-      <Resource name="planet" list={ListGuesser} />
-      <Resource name="starship" list={ListGuesser} />
+      <Resource name="Planet" list={ListGuesser} />
     </Admin>
   );
 };
