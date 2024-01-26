@@ -15,7 +15,7 @@ interface Planet {
 
 const PlanetList: React.FC = (props) => {
   const unique = useUnique();
-  const postFilters = [<SearchInput source="name" alwaysOn resettable={true} validate={unique({ debounce: 3000 })} />];
+  const postFilters = [<SearchInput source="name" alwaysOn resettable validate={unique({ debounce: 3000 })} />];
 
   return (
     <List {...props} filters={postFilters} sort={{ field: 'name', order: 'ASC' }}>
