@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
 import { GetListResult } from 'react-admin';
 export const queries = () => {
+  
   return {
     query: gql`
       query Planets {
