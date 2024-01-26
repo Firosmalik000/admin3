@@ -1,16 +1,7 @@
 // PlanetList.tsx
 import * as React from 'react';
 import { List, Datagrid, FunctionField, TextField, useUnique, SearchInput, Pagination } from 'react-admin';
-interface Starships {
-  id: string;
-  name: string;
-  filmConnection: {
-    films: {
-      id: string;
-      title: string;
-    }[];
-  };
-}
+import { Starships } from '../types';
 
 const PostPagination = () => <Pagination rowsPerPageOptions={[5, 10, 15, 25]} />;
 
