@@ -1,6 +1,6 @@
 // PlanetList.tsx
 import * as React from 'react';
-import { List, Datagrid, FunctionField, TextField, SearchInput, SelectInput } from 'react-admin';
+import { List, Datagrid, FunctionField, TextField, useUnique, SearchInput } from 'react-admin';
 
 interface Planet {
   id: string;
@@ -13,15 +13,27 @@ interface Planet {
   };
 }
 
-const postFilters = [<SearchInput source="q" alwaysOn resettable={false} />, <SelectInput source="name" />];
+const PlanetList: React.FC = (props) => {
+  const unique = useUnique();
+  const postFilters = [<SearchInput source="name" alwaysOn resettable={true} validate={unique({ debounce: 3000 })} />];
 
-const PlanetList: React.FC = (props) => (
-  <List {...props} filters={postFilters}>
-    <Datagrid rowClick="edit">
-      <TextField source="name" label="Planet Name" sortable={false} />
-      <FunctionField label="Film Titles" render={(record: Planet) => record.filmConnection.films.map((film) => film.title).join(', ')} />
-    </Datagrid>
-  </List>
-);
+  return (
+    <List {...props} filters={postFilters} sort={{ field: 'name', order: 'ASC' }}>
+      <Datagrid rowClick="edit">
+        <TextField source="name" label="Planet Name" />
+        <FunctionField
+          label="Film Titles"
+          render={(record: Planet) => (
+            <ul>
+              {record.filmConnection.films.map((film) => (
+                <li key={film.id}>{film.title}</li>
+              ))}
+            </ul>
+          )}
+        />
+      </Datagrid>
+    </List>
+  );
+};
 
 export default PlanetList;

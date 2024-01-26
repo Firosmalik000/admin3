@@ -1,7 +1,6 @@
 // PlanetList.tsx
 import * as React from 'react';
-import { List, Datagrid, FunctionField, TextField, SearchInput, SelectInput } from 'react-admin';
-
+import { List, Datagrid, FunctionField, TextField, useUnique, SearchInput } from 'react-admin';
 interface Starships {
   id: string;
   name: string;
@@ -13,15 +12,26 @@ interface Starships {
   };
 }
 
-const postFilters = [<SearchInput source="q" alwaysOn resettable={false} />, <TextField source="name" label="Name" sort={{ field: 'name', order: 'ASC' }} />, <SelectInput source="name" />];
-
-const StarshipsList: React.FC = (props) => (
-  <List {...props} filters={postFilters}>
-    <Datagrid rowClick="edit">
-      <TextField source="name" label="Starships Name" />
-      <FunctionField label="Film Titles" render={(record: Starships) => record.filmConnection.films.map((film) => film.title).join(', ')} />
-    </Datagrid>
-  </List>
-);
+const StarshipsList: React.FC = (props) => {
+  const unique = useUnique();
+  const postFilters = [<SearchInput source="name" alwaysOn resettable={true} validate={unique({ debounce: 3000 })} />];
+  return (
+    <List {...props} filters={postFilters}>
+      <Datagrid rowClick="edit">
+        <TextField source="name" label="Starships Name" sortByOrder="DESC" />
+        <FunctionField
+          label="Film Titles"
+          render={(record: Starships) => (
+            <ul>
+              {record.filmConnection.films.map((film) => (
+                <li key={film.id}>{film.title}</li>
+              ))}
+            </ul>
+          )}
+        />
+      </Datagrid>
+    </List>
+  );
+};
 
 export default StarshipsList;
